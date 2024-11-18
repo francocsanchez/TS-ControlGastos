@@ -1,7 +1,18 @@
+import BudgetForm from "./components/BudgetForm";
+import { useBudget } from "./hooks/useBudget";
+
 function App() {
+  const { state, dispatch } = useBudget();
+
   return (
     <>
-      <h1 className="text-3xl font-bold underline">Control de gastos</h1>
+      <header className="bg-blue-600 py-8 max-h-72">
+        <h1 className="uppercase text-center font-black text-white text-4xl">Planificador de gastos</h1>
+      </header>
+
+      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg mt-10 p-10">
+        <BudgetForm />
+      </div>
     </>
   );
 }
