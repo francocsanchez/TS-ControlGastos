@@ -83,7 +83,7 @@ export default function ExpenseForm() {
         <label htmlFor="category" className="text-xl">
           Monto:
         </label>
-        <select id="category" className="bg-slate-100 p-2" name="category" defaultValue="" value={expense.category} onChange={handleChange}>
+        <select id="category" className="bg-slate-100 p-2" name="category" value={expense.category} onChange={handleChange}>
           <option value="" disabled>
             --- Seleccionar ---
           </option>

@@ -1,7 +1,7 @@
 import { formatCurrency } from "../helpers";
 
 type AmountDisplayPropos = {
-  label: string;
+  label?: string;
   amount: number;
 };
 
