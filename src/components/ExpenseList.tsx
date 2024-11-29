@@ -5,7 +5,7 @@ import ExpenseDetails from "./ExpenseDetails";
 export default function ExpenseList() {
   const { state } = useBudget();
 
-  const isEmpty = useMemo(() => state.expense.length === 0, [state.expense]);
+  const isEmpty = useMemo(() => state.expenses.length === 0, [state.expenses]);
   return (
     <div className="mt-2">
       {isEmpty ? (
@@ -13,7 +13,7 @@ export default function ExpenseList() {
       ) : (
         <>
           <p className="text-gray-600 text-2xl font-bold uppercase text-center">Listado de gastos</p>
-          {state.expense.map((expense) => (
+          {state.expenses.map((expense) => (
             <ExpenseDetails expense={expense} key={expense.id} />
           ))}
         </>
