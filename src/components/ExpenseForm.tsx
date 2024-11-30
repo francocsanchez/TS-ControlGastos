@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent } from "react";
+import { ChangeEvent, FormEvent, useEffect } from "react";
 import { categories } from "../data/categories";
 import DatePicker from "react-date-picker";
 import "react-calendar/dist/Calendar.css";
@@ -11,7 +11,7 @@ import ErrorMessage from "./ErrorMessage";
 import { useBudget } from "../hooks/useBudget";
 
 export default function ExpenseForm() {
-  const { dispatch } = useBudget();
+  const { dispatch, state } = useBudget();
   const [error, setError] = useState("");
   const [expense, setExpense] = useState<DrafExpense>({
     amount: 0,
@@ -44,12 +44,33 @@ export default function ExpenseForm() {
       return;
     }
 
-    dispatch({ type: "add-expense", payload: { expense } });
+    if (state.editingId) {
+      dispatch({
+        type: "update-expense",
+        payload: {
+          expense: {
+            id: state.editingId,
+            ...expense,
+          },
+        },
+      });
+    } else {
+      dispatch({ type: "add-expense", payload: { expense } });
+    }
   };
+
+  useEffect(() => {
+    if (state.editingId) {
+      const editingExpenses = state.expenses.filter((expense) => expense.id === state.editingId)[0];
+      setExpense(editingExpenses);
+    }
+  }, [state.editingId]);
 
   return (
     <form action="" className="space-y-5" onSubmit={handleSubmit}>
-      <legend className="uppercase text-center text-2xl font-black border-b-4 border-blue-500 py-2">Nuevo gasto</legend>
+      <legend className="uppercase text-center text-2xl font-black border-b-4 border-blue-500 py-2">
+        {state.editingId ? "Guardar cambios" : "Nuevo gasto"}
+      </legend>
       {error && <ErrorMessage error={error} />}
       <div className="flex flex-col gap-2">
         <label htmlFor="expenseName" className="text-xl">
@@ -103,7 +124,7 @@ export default function ExpenseForm() {
       <input
         type="submit"
         className="w-full bg-blue-600 cursor-pointer text-white uppercase p-2 font-bold rounded-lg hover:bg-blue-700"
-        value={"Guardar"}
+        value={state.editingId ? "Actualizar" : "Guardar"}
       />
     </form>
   );

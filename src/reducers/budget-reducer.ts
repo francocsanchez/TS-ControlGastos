@@ -5,18 +5,33 @@ export type BudgetAction =
   | { type: "add-budget"; payload: { budget: number } }
   | { type: "reset-app" }
   | { type: "modal-action" }
-  | { type: "add-expense"; payload: { expense: DrafExpense } };
+  | { type: "add-expense"; payload: { expense: DrafExpense } }
+  | { type: "remove-expense"; payload: { id: Expense["id"] } }
+  | { type: "get-expense-by-id"; payload: { id: Expense["id"] } }
+  | { type: "update-expense"; payload: { expense: Expense } };
 
 export type BudgetState = {
   budget: number;
   modal: boolean;
-  expense: Expense[];
+  expenses: Expense[];
+  editingId: Expense["id"];
+};
+
+const initialBudget = (): number => {
+  const localStorageBudget = localStorage.getItem("budget");
+  return localStorageBudget ? +localStorageBudget : 0;
+};
+
+const initialExpenses = (): Expense[] => {
+  const localStorageExpenses = localStorage.getItem("expenses");
+  return localStorageExpenses ? JSON.parse(localStorageExpenses) : [];
 };
 
 export const initialState: BudgetState = {
-  budget: 0,
+  budget: initialBudget(),
   modal: false,
-  expense: [],
+  expenses: initialExpenses(),
+  editingId: "",
 };
 
 export const budgetReducer = (state: BudgetState = initialState, action: BudgetAction) => {
@@ -29,8 +44,10 @@ export const budgetReducer = (state: BudgetState = initialState, action: BudgetA
 
   if (action.type === "reset-app") {
     return {
-      ...state,
       budget: 0,
+      modal: false,
+      expenses: [],
+      editingId: "",
     };
   }
 
@@ -38,6 +55,7 @@ export const budgetReducer = (state: BudgetState = initialState, action: BudgetA
     return {
       ...state,
       modal: !state.modal,
+      editingId: "",
     };
   }
 
@@ -52,8 +70,33 @@ export const budgetReducer = (state: BudgetState = initialState, action: BudgetA
     let newExpense = createExpense(action.payload.expense);
     return {
       ...state,
-      expense: [...state.expense, newExpense],
+      expenses: [...state.expenses, newExpense],
       modal: false,
+    };
+  }
+
+  if (action.type === "remove-expense") {
+    let UpdateExpenses = state.expenses.filter((expense) => expense.id !== action.payload.id);
+    return {
+      ...state,
+      expenses: UpdateExpenses,
+    };
+  }
+
+  if (action.type === "get-expense-by-id") {
+    return {
+      ...state,
+      editingId: action.payload.id,
+      modal: true,
+    };
+  }
+
+  if (action.type === "update-expense") {
+    return {
+      ...state,
+      expenses: state.expenses.map((expense) => (expense.id === action.payload.expense.id ? action.payload.expense : expense)),
+      modal: false,
+      editingId: "",
     };
   }
   return state;
