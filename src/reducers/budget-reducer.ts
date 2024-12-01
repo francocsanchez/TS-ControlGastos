@@ -1,5 +1,5 @@
 import { v4 as uuidV4 } from "uuid";
-import { DrafExpense, Expense } from "../types";
+import { Categoria, DrafExpense, Expense } from "../types";
 
 export type BudgetAction =
   | { type: "add-budget"; payload: { budget: number } }
@@ -8,13 +8,15 @@ export type BudgetAction =
   | { type: "add-expense"; payload: { expense: DrafExpense } }
   | { type: "remove-expense"; payload: { id: Expense["id"] } }
   | { type: "get-expense-by-id"; payload: { id: Expense["id"] } }
-  | { type: "update-expense"; payload: { expense: Expense } };
+  | { type: "update-expense"; payload: { expense: Expense } }
+  | { type: "add-filter-category"; payload: { id: Categoria["id"] } };
 
 export type BudgetState = {
   budget: number;
   modal: boolean;
   expenses: Expense[];
   editingId: Expense["id"];
+  currentCategory: Categoria["id"];
 };
 
 const initialBudget = (): number => {
@@ -32,6 +34,7 @@ export const initialState: BudgetState = {
   modal: false,
   expenses: initialExpenses(),
   editingId: "",
+  currentCategory: "",
 };
 
 export const budgetReducer = (state: BudgetState = initialState, action: BudgetAction) => {
@@ -97,6 +100,13 @@ export const budgetReducer = (state: BudgetState = initialState, action: BudgetA
       expenses: state.expenses.map((expense) => (expense.id === action.payload.expense.id ? action.payload.expense : expense)),
       modal: false,
       editingId: "",
+    };
+  }
+
+  if (action.type === "add-filter-category") {
+    return {
+      ...state,
+      currentCategory: action.payload.id,
     };
   }
   return state;
